@@ -8,3 +8,4 @@ router.use('/ping', pingCheck);
 router.use('/projects', projectRouter);
 
 export default router;
+
