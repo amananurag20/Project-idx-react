@@ -14,4 +14,3 @@ export const useActiveFileTabStore = create((set) => {
         }
     }
 });
-

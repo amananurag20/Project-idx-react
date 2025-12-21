@@ -38,5 +38,3 @@ webSocketForTerminal.on("connection", async (ws, req, container) => {
     
 });
 
-
-

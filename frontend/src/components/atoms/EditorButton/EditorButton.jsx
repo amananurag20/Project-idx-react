@@ -19,4 +19,3 @@ export const EditorButton = ({ isActive }) => {
         </button>
     )
 }
-

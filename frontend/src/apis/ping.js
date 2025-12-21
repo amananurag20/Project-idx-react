@@ -10,6 +10,3 @@ export const pingApi = async () => {
         throw error;
     }
 }
-
-
-

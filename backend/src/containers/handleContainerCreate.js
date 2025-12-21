@@ -104,5 +104,3 @@ export async function getContainerPort(containerName) {
         
     }
 }
-
-

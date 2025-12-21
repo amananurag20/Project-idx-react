@@ -1,4 +1,5 @@
 
+
 export const handleTerminalCreation = (container, ws) => {
     container.exec({
         Cmd: ["/bin/bash"],
@@ -82,5 +83,3 @@ function processStreamOutput(stream, ws) {
     stream.on("data", processStreamData);
 
 }
-
-
