@@ -1,69 +1,85 @@
 .tree-node {
-    padding-left: 16px;
-    color: #ffffff;
-  }
-  
-  .folder-node {
-    position: relative;
-  }
-  
-  .folder-button {
-    display: flex;
-    align-items: center;
-    width: 100%;
-    padding: 8px;
-    background: transparent;
-    border: none;
-    cursor: pointer;
-    color: #ffffff;
-    transition: background-color 0.2s;
-    border-radius: 4px;
-  }
-  
-  .folder-button:hover {
-    background-color: rgba(255, 255, 255, 0.1);
-  }
-  
-  .file-node {
-    display: flex;
-    align-items: center;
-    padding: 8px;
-    cursor: pointer;
-    transition: background-color 0.2s;
-    border-radius: 4px;
-    margin-left: 24px;
-  }
-  
-  .file-node:hover {
-    background-color: rgba(255, 255, 255, 0.1);
-  }
-  
-  .arrow-icon {
-    font-size: 12px;
-    margin-right: 8px;
-    color: #8c8c8c;
-  }
-  
-  .folder-icon {
-    font-size: 16px;
-    margin-right: 8px;
-    color: #1890ff;
-  }
-  
-  .file-icon-wrapper {
-    display: flex;
-    align-items: center;
-    margin-right: 8px;
-    width: 20px; 
-    height: 20px; 
-  }
-  
-  .node-text {
-    font-size: 14px;
-    color: #ffffff;
-    margin-left: 4px;
-  }
-  
-  .children-container {
-    margin-top: 4px;
-  }
+  padding-left: 12px;
+  color: #c0caf5;
+  font-size: 13px;
+}
+
+.folder-node {
+  position: relative;
+}
+
+.folder-button {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 6px 8px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: #c0caf5;
+  transition: all 0.15s ease;
+  border-radius: 6px;
+  gap: 6px;
+}
+
+.folder-button:hover {
+  background-color: rgba(122, 162, 247, 0.1);
+}
+
+.file-node {
+  display: flex;
+  align-items: center;
+  padding: 6px 8px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  border-radius: 6px;
+  margin-left: 20px;
+  gap: 6px;
+}
+
+.file-node:hover {
+  background-color: rgba(122, 162, 247, 0.1);
+}
+
+.file-node:active {
+  background-color: rgba(122, 162, 247, 0.2);
+}
+
+.arrow-icon {
+  font-size: 10px;
+  color: #565f89;
+  transition: transform 0.15s ease;
+}
+
+.folder-icon {
+  font-size: 14px;
+  color: #7aa2f7;
+}
+
+.file-icon-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+}
+
+.node-text {
+  font-size: 13px;
+  color: #c0caf5;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.folder-button:hover .node-text,
+.file-node:hover .node-text {
+  color: #ffffff;
+}
+
+.children-container {
+  margin-top: 2px;
+  border-left: 1px solid rgba(65, 72, 104, 0.3);
+  margin-left: 8px;
+}

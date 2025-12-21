@@ -27,7 +27,7 @@ const webSocketForTerminal = new WebSocketServer({
 webSocketForTerminal.on("connection", async (ws, req, container) => {
     const isTerminal = req.url.includes("/terminal");
 
-    if(isTerminal) {
+    if (isTerminal) {
         const projectId = req.url.split("=")[1];
         console.log("Project id received after connection", projectId);
 
@@ -35,6 +35,6 @@ webSocketForTerminal.on("connection", async (ws, req, container) => {
 
         handleTerminalCreation(container, ws);
     }
-    
+
 });
 

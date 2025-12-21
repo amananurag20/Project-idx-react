@@ -3,7 +3,8 @@ import { getAllProjects } from "../../../apis/projects";
 
 export const useGetAllProjects = () => {
   const { isLoading, isError, data, error } = useQuery({
-    queryFn: () => getAllProjects(),
+    queryKey: ["allProjects"],
+    queryFn: getAllProjects,
   });
 
   return {

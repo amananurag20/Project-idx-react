@@ -1,4 +1,165 @@
+@import "tailwindcss";
+
+/* Custom scrollbar for dark theme */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #1a1b26;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #414868;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #565f89;
+}
+
+/* Terminal scrollbar fix */
+.xterm-viewport::-webkit-scrollbar {
+    width: 10px;
+}
+
+.xterm-viewport::-webkit-scrollbar-track {
+    background: #1a1b26;
+}
+
+.xterm-viewport::-webkit-scrollbar-thumb {
+    background: #414868;
+    border-radius: 4px;
+}
+
+.xterm-viewport {
+    overflow-y: auto !important;
+}
+
+/* Ensure terminal container allows scrolling */
+.terminal-wrapper {
+    overflow: hidden;
+}
+
+.terminal-wrapper .xterm {
+    height: 100%;
+}
+
+/* Monaco Editor adjustments */
+.monaco-editor .margin {
+    background: transparent !important;
+}
+
+/* Allotment resizer styling */
+.allotment-sash {
+    background: #414868 !important;
+}
+
+.allotment-sash:hover {
+    background: #7aa2f7 !important;
+}
+
+/* Smooth animations */
 * {
-    margin: 0;
-    padding: 0;
+    transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+/* Glass morphism utility */
+.glass {
+    background: rgba(26, 27, 38, 0.8);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Gradient text */
+.gradient-text {
+    background: linear-gradient(135deg, #7aa2f7 0%, #bb9af7 50%, #f7768e 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* Glow effects */
+.glow-blue {
+    box-shadow: 0 0 20px rgba(122, 162, 247, 0.3);
+}
+
+.glow-purple {
+    box-shadow: 0 0 20px rgba(187, 154, 247, 0.3);
+}
+
+/* Button hover glow */
+.btn-glow:hover {
+    box-shadow: 0 0 30px rgba(122, 162, 247, 0.5);
+}
+
+/* Card hover effect */
+.card-hover:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+}
+
+/* Pulse animation */
+@keyframes pulse-glow {
+
+    0%,
+    100% {
+        box-shadow: 0 0 20px rgba(122, 162, 247, 0.4);
+    }
+
+    50% {
+        box-shadow: 0 0 40px rgba(122, 162, 247, 0.8);
+    }
+}
+
+.pulse-glow {
+    animation: pulse-glow 2s ease-in-out infinite;
+}
+
+/* Fade in animation */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.fade-in {
+    animation: fadeIn 0.5s ease-out forwards;
+}
+
+/* Stagger children animation */
+.stagger-children>* {
+    animation: fadeIn 0.5s ease-out forwards;
+    opacity: 0;
+}
+
+.stagger-children>*:nth-child(1) {
+    animation-delay: 0.1s;
+}
+
+.stagger-children>*:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+.stagger-children>*:nth-child(3) {
+    animation-delay: 0.3s;
+}
+
+.stagger-children>*:nth-child(4) {
+    animation-delay: 0.4s;
+}
+
+.stagger-children>*:nth-child(5) {
+    animation-delay: 0.5s;
+}
+
+.stagger-children>*:nth-child(6) {
+    animation-delay: 0.6s;
 }

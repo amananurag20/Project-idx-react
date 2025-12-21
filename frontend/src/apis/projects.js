@@ -5,7 +5,7 @@ export const createProjectApi = async () => {
         const response = await axios.post('/api/v1/projects');
         console.log(response.data);
         return response.data;
-    } catch(error) {
+    } catch (error) {
         console.log(error);
         throw error;
     }
@@ -16,7 +16,7 @@ export const getProjectTree = async ({ projectId }) => {
         const response = await axios.get(`/api/v1/projects/${projectId}/tree`);
         console.log(response.data);
         return response?.data?.data;
-    } catch(error) {
+    } catch (error) {
         console.log(error);
         throw error;
     }
@@ -24,11 +24,11 @@ export const getProjectTree = async ({ projectId }) => {
 
 export const getAllProjects = async () => {
     try {
-      const response = await axios.get(`/api/v1/projects`);
-      // console.log(response.data);
-      return response?.data?.data;
+        const response = await axios.get(`/api/v1/projects`);
+        // console.log(response.data);
+        return response?.data?.data || [];
     } catch (error) {
-      console.log(error);
-      throw error;
+        console.log(error);
+        throw error;
     }
-  };
+};
