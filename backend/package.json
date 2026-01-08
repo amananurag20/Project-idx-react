@@ -4,13 +4,17 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "dev": "npx nodemon src/index.js"
+    "dev": "npx nodemon src/index.js",
+    "dev:server": "npx nodemon src/index.js",
+    "dev:terminal": "npx nodemon src/terminalApp.js",
+    "dev:all": "concurrently \"npm run dev:server\" \"npm run dev:terminal\""
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "archiver": "^7.0.1",
     "chokidar": "^4.0.1",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
@@ -23,6 +27,7 @@
     "ws": "^8.18.0"
   },
   "devDependencies": {
+    "concurrently": "^9.2.1",
     "nodemon": "^3.1.7"
   }
 }

@@ -13,7 +13,15 @@ const server = createServer(app);
 const io = new Server(server, {
     cors: {
         origin: '*',
-        method: ['GET', 'POST'],
+        methods: ['GET', 'POST'],
+    },
+    pingTimeout: 60000,
+    pingInterval: 25000,
+    transports: ['websocket', 'polling'],
+    allowUpgrades: true,
+    connectionStateRecovery: {
+        maxDisconnectionDuration: 2 * 60 * 1000,
+        skipMiddlewares: true,
     }
 });
 
@@ -38,7 +46,7 @@ editorNamespace.on("connection", (socket) => {
 
     console.log("Project id received after connection", projectId);
 
-    if(projectId) {
+    if (projectId) {
         var watcher = chokidar.watch(`./projects/${projectId}`, {
             ignored: (path) => path.includes("node_modules"),
             persistent: true, /** keeps the watcher in running state till the time app is running */

@@ -45,6 +45,16 @@
   background-color: rgba(122, 162, 247, 0.2);
 }
 
+.file-node.selected {
+  background-color: rgba(122, 162, 247, 0.15);
+  border-left: 2px solid #7aa2f7;
+  margin-left: 18px;
+}
+
+.file-node.selected .node-text {
+  color: #ffffff;
+}
+
 .arrow-icon {
   font-size: 10px;
   color: #565f89;
@@ -54,6 +64,10 @@
 .folder-icon {
   font-size: 14px;
   color: #7aa2f7;
+}
+
+.folder-icon.open {
+  color: #9ece6a;
 }
 
 .file-icon-wrapper {

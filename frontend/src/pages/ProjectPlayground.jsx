@@ -1,4 +1,4 @@
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { EditorComponent } from "../components/molecules/EditorComponent/EditorComponent";
 import { TreeStructure } from "../components/organisms/TreeStructure/TreeStructure";
 import { useEffect, useState } from "react";
@@ -14,12 +14,14 @@ import { useActiveFileTabStore } from "../store/activeFileTabStore";
 
 export const ProjectPlayground = () => {
     const { projectId: projectIdFromUrl } = useParams();
+    const navigate = useNavigate();
     const { setProjectId, projectId } = useTreeStructureStore();
     const { setEditorSocket } = useEditorSocketStore();
     const { terminalSocket, setTerminalSocket } = useTerminalSocketStore();
     const { activeFileTab } = useActiveFileTabStore();
     const [loadBrowser, setLoadBrowser] = useState(false);
     const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+    const [isExporting, setIsExporting] = useState(false);
 
     useEffect(() => {
         if (projectIdFromUrl) {
@@ -46,6 +48,42 @@ export const ProjectPlayground = () => {
         }
     }, [setProjectId, projectIdFromUrl, setEditorSocket, setTerminalSocket]);
 
+    // Handle back navigation
+    const handleBack = () => {
+        // Close WebSocket connections
+        terminalSocket?.close();
+        navigate("/");
+    };
+
+    // Handle export project
+    const handleExport = async () => {
+        setIsExporting(true);
+        try {
+            const response = await fetch(
+                `${import.meta.env.VITE_BACKEND_URL || "http://localhost:3000"}/api/v1/projects/${projectIdFromUrl}/export`
+            );
+
+            if (response.ok) {
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement("a");
+                a.href = url;
+                a.download = `project-${projectIdFromUrl.slice(0, 8)}.zip`;
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+                document.body.removeChild(a);
+            } else {
+                console.error("Export failed");
+                alert("Export feature coming soon! For now, you can access your project files at: backend/projects/" + projectIdFromUrl);
+            }
+        } catch (error) {
+            console.error("Export error:", error);
+            alert("Export feature coming soon! For now, you can access your project files at: backend/projects/" + projectIdFromUrl);
+        }
+        setIsExporting(false);
+    };
+
     return (
         <div className="h-screen w-screen bg-[#0f0f23] flex overflow-hidden">
             {/* Sidebar - File Explorer */}
@@ -57,6 +95,25 @@ export const ProjectPlayground = () => {
                 <div className="h-12 flex items-center justify-between px-3 border-b border-[#292e42]">
                     {!sidebarCollapsed && (
                         <div className="flex items-center gap-2">
+                            <button
+                                onClick={handleBack}
+                                className="p-1.5 rounded-lg hover:bg-[#292e42] text-gray-400 hover:text-white transition-colors cursor-pointer"
+                                title="Back to Home"
+                            >
+                                <svg
+                                    className="w-4 h-4"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                    stroke="currentColor"
+                                >
+                                    <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        strokeWidth={2}
+                                        d="M10 19l-7-7m0 0l7-7m-7 7h18"
+                                    />
+                                </svg>
+                            </button>
                             <span className="text-lg">📁</span>
                             <span className="text-sm font-medium text-gray-300 truncate">
                                 Explorer
@@ -94,6 +151,13 @@ export const ProjectPlayground = () => {
                 {/* Collapsed icons */}
                 {sidebarCollapsed && (
                     <div className="flex flex-col items-center gap-2 py-4">
+                        <button
+                            onClick={handleBack}
+                            className="p-2 rounded-lg hover:bg-[#292e42] text-gray-400 hover:text-white transition-colors cursor-pointer"
+                            title="Back to Home"
+                        >
+                            🏠
+                        </button>
                         <button className="p-2 rounded-lg hover:bg-[#292e42] text-gray-400 hover:text-white transition-colors">
                             📄
                         </button>
@@ -108,8 +172,30 @@ export const ProjectPlayground = () => {
             <div className="flex-1 flex flex-col h-full overflow-hidden">
                 {/* Top Bar */}
                 <div className="h-12 bg-[#1a1b26] border-b border-[#292e42] flex items-center justify-between px-4">
-                    {/* Tabs */}
-                    <div className="flex items-center gap-1">
+                    {/* Left side - Back button and tabs */}
+                    <div className="flex items-center gap-3">
+                        {/* Back Button */}
+                        <button
+                            onClick={handleBack}
+                            className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium bg-[#292e42] text-gray-300 hover:bg-[#363b54] hover:text-white transition-all cursor-pointer"
+                        >
+                            <svg
+                                className="w-4 h-4"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                            >
+                                <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth={2}
+                                    d="M10 19l-7-7m0 0l7-7m-7 7h18"
+                                />
+                            </svg>
+                            Home
+                        </button>
+
+                        {/* Tabs */}
                         {activeFileTab?.path && (
                             <div className="flex items-center gap-2 px-4 py-2 bg-[#0f0f23] rounded-t-lg border-t-2 border-blue-500">
                                 <span className="text-sm">📄</span>
@@ -122,6 +208,53 @@ export const ProjectPlayground = () => {
 
                     {/* Actions */}
                     <div className="flex items-center gap-2">
+                        {/* Export Button */}
+                        <button
+                            onClick={handleExport}
+                            disabled={isExporting}
+                            className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium bg-[#292e42] text-gray-300 hover:bg-[#363b54] hover:text-white transition-all cursor-pointer disabled:opacity-50"
+                            title="Export Project"
+                        >
+                            {isExporting ? (
+                                <svg
+                                    className="animate-spin h-4 w-4"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                >
+                                    <circle
+                                        className="opacity-25"
+                                        cx="12"
+                                        cy="12"
+                                        r="10"
+                                        stroke="currentColor"
+                                        strokeWidth="4"
+                                    ></circle>
+                                    <path
+                                        className="opacity-75"
+                                        fill="currentColor"
+                                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                                    ></path>
+                                </svg>
+                            ) : (
+                                <svg
+                                    className="w-4 h-4"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                    stroke="currentColor"
+                                >
+                                    <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        strokeWidth={2}
+                                        d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
+                                    />
+                                </svg>
+                            )}
+                            Export
+                        </button>
+
+                        {/* Preview Button */}
                         <button
                             onClick={() => setLoadBrowser(!loadBrowser)}
                             className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all cursor-pointer ${loadBrowser

@@ -4,17 +4,54 @@ import { usePortStore } from "../../../store/portStore";
 
 export const Browser = ({ projectId }) => {
     const browserRef = useRef(null);
-    const { port } = usePortStore();
+    const { port, setPort } = usePortStore();
     const { editorSocket } = useEditorSocketStore();
     const [url, setUrl] = useState("");
     const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState(null);
 
+    // Listen for port success event
     useEffect(() => {
-        if (!port) {
-            editorSocket?.emit("getPort", {
+        if (!editorSocket) return;
+
+        const handlePortSuccess = ({ port: receivedPort }) => {
+            console.log("Received port:", receivedPort);
+            if (receivedPort) {
+                setPort(receivedPort);
+                setUrl(`http://localhost:${receivedPort}`);
+                setError(null);
+            } else {
+                setError("Port not available yet. Run 'npm run dev' in terminal first.");
+            }
+        };
+
+        editorSocket.on("getPortSuccess", handlePortSuccess);
+
+        return () => {
+            editorSocket.off("getPortSuccess", handlePortSuccess);
+        };
+    }, [editorSocket, setPort]);
+
+    // Request port when component mounts or when no port
+    useEffect(() => {
+        if (!port && editorSocket && projectId) {
+            console.log("Requesting port for project:", projectId);
+            editorSocket.emit("getPort", {
                 containerName: projectId,
             });
-        } else {
+
+            // Retry every 3 seconds if no port
+            const retryInterval = setInterval(() => {
+                if (!port) {
+                    console.log("Retrying port request...");
+                    editorSocket.emit("getPort", {
+                        containerName: projectId,
+                    });
+                }
+            }, 3000);
+
+            return () => clearInterval(retryInterval);
+        } else if (port) {
             setUrl(`http://localhost:${port}`);
         }
     }, [port, editorSocket, projectId]);
@@ -26,23 +63,49 @@ export const Browser = ({ projectId }) => {
         }
     };
 
+    const handleRetryPort = () => {
+        setError(null);
+        editorSocket?.emit("getPort", {
+            containerName: projectId,
+        });
+    };
+
     const handleIframeLoad = () => {
+        setIsLoading(false);
+    };
+
+    const handleIframeError = () => {
         setIsLoading(false);
     };
 
     if (!port) {
         return (
             <div className="h-full flex flex-col items-center justify-center bg-[#0f0f23] text-gray-400">
-                <div className="flex flex-col items-center gap-4">
+                <div className="flex flex-col items-center gap-4 p-6 max-w-md text-center">
                     <div className="relative">
                         <div className="w-16 h-16 border-4 border-blue-500/30 rounded-full"></div>
                         <div className="absolute inset-0 w-16 h-16 border-4 border-transparent border-t-blue-500 rounded-full animate-spin"></div>
                     </div>
                     <div className="text-center">
-                        <p className="text-lg font-medium text-white mb-1">Starting Preview</p>
-                        <p className="text-sm text-gray-500">
-                            Run <code className="bg-[#292e42] px-2 py-1 rounded text-blue-400">npm run dev</code> in terminal
+                        <p className="text-lg font-medium text-white mb-2">
+                            Starting Preview
                         </p>
+                        <p className="text-sm text-gray-500 mb-4">
+                            Run{" "}
+                            <code className="bg-[#292e42] px-2 py-1 rounded text-blue-400">
+                                npm run dev
+                            </code>{" "}
+                            in the terminal first
+                        </p>
+                        {error && (
+                            <p className="text-sm text-yellow-500 mb-4">{error}</p>
+                        )}
+                        <button
+                            onClick={handleRetryPort}
+                            className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors cursor-pointer"
+                        >
+                            Retry Connection
+                        </button>
                     </div>
                 </div>
             </div>
@@ -99,7 +162,12 @@ export const Browser = ({ projectId }) => {
                     className="p-2 rounded-lg hover:bg-[#292e42] text-gray-400 hover:text-white transition-colors cursor-pointer"
                     title="Open in new tab"
                 >
-                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <svg
+                        className="w-4 h-4"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                    >
                         <path
                             strokeLinecap="round"
                             strokeLinejoin="round"
@@ -145,6 +213,7 @@ export const Browser = ({ projectId }) => {
                     ref={browserRef}
                     src={`http://localhost:${port}`}
                     onLoad={handleIframeLoad}
+                    onError={handleIframeError}
                     className="w-full h-full border-none bg-white"
                     title="Preview"
                     sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-modals"

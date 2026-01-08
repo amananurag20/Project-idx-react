@@ -16,18 +16,31 @@ export const handleContainerCreate = async (projectId, terminalSocket, req, tcpS
     console.log("Project id received for container create", projectId);
     try {
 
-        // Delete any existing container running with same name
-        const existingContainer = await docker.listContainers({
-            name: projectId
+        // Delete any existing container (running OR stopped) with same name
+        // Using 'all: true' to include stopped containers
+        const existingContainers = await docker.listContainers({
+            all: true,
+            filters: { name: [projectId] }
         });
 
+        console.log("Existing containers found:", existingContainers.length);
 
-        console.log("Existing container", existingContainer);
+        // Remove all containers with this name
+        for (const containerInfo of existingContainers) {
+            // Check if the container name matches exactly (Docker adds a leading /)
+            const names = containerInfo.Names || [];
+            const exactMatch = names.some(name => name === `/${projectId}` || name === projectId);
 
-        if(existingContainer.length > 0) {
-            console.log("Container already exists, stopping and removing it");
-            const container = docker.getContainer(existingContainer[0].Id);
-            await container.remove({force: true});
+            if (exactMatch) {
+                console.log("Container already exists, stopping and removing it:", containerInfo.Id);
+                try {
+                    const container = docker.getContainer(containerInfo.Id);
+                    await container.remove({ force: true });
+                    console.log("Removed existing container");
+                } catch (removeError) {
+                    console.log("Error removing container:", removeError.message);
+                }
+            }
         }
 
         console.log("Creating a new container");
@@ -45,7 +58,7 @@ export const handleContainerCreate = async (projectId, terminalSocket, req, tcpS
                 "/home/sandbox/app": {}
             },
             ExposedPorts: {
-                    "5173/tcp": {}
+                "5173/tcp": {}
             },
             Env: ["HOST=0.0.0.0"],
             HostConfig: {
@@ -59,10 +72,10 @@ export const handleContainerCreate = async (projectId, terminalSocket, req, tcpS
                         }
                     ]
                 },
-                
+
             }
         });
-    
+
         console.log("Container created", container.id);
 
         await container.start();
@@ -79,8 +92,9 @@ export const handleContainerCreate = async (projectId, terminalSocket, req, tcpS
 
 
 
-    } catch(error) {
-        console.log("Error while creating container", error);
+    } catch (error) {
+        console.log("Failed to create container", error);
+        return null;
     }
 
 
@@ -92,15 +106,15 @@ export async function getContainerPort(containerName) {
         name: containerName
     });
 
-    if(container.length > 0) {
+    if (container.length > 0) {
         const containerInfo = await docker.getContainer(container[0].Id).inspect();
         console.log("Container info", containerInfo);
         try {
             return containerInfo?.NetworkSettings?.Ports["5173/tcp"][0].HostPort;
-        } catch(error) {
+        } catch (error) {
             console.log("port not present");
             return undefined;
         }
-        
+
     }
 }

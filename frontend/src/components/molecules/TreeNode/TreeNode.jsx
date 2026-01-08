@@ -1,5 +1,10 @@
 import { useEffect, useState } from "react";
-import { DownOutlined, RightOutlined, FolderOutlined } from "@ant-design/icons";
+import {
+  DownOutlined,
+  RightOutlined,
+  FolderOutlined,
+  FolderOpenOutlined,
+} from "@ant-design/icons";
 import { useEditorSocketStore } from "../../../store/editorSocketStore";
 import { useFileContextMenuStore } from "../../../store/fileContextMenuStore";
 
@@ -8,6 +13,7 @@ import { FileIcon } from "../../atoms/FileIcon/Fileicon";
 
 export const TreeNode = ({ fileFolderData }) => {
   const [visibility, setVisibility] = useState({});
+  const [selectedFile, setSelectedFile] = useState(null);
   const { editorSocket } = useEditorSocketStore();
   const {
     setFile,
@@ -28,7 +34,9 @@ export const TreeNode = ({ fileFolderData }) => {
     return names[names.length - 1];
   }
 
-  function handleDoubleClick(fileFolderData) {
+  // Changed from double-click to single-click
+  function handleFileClick(fileFolderData) {
+    setSelectedFile(fileFolderData.path);
     editorSocket.emit("readFile", {
       pathToFileOrFolder: fileFolderData.path,
     });
@@ -43,8 +51,8 @@ export const TreeNode = ({ fileFolderData }) => {
   }
 
   useEffect(() => {
-    console.log("Visibility chanmged", visibility); 
-}, [visibility])
+    console.log("Visibility changed", visibility);
+  }, [visibility]);
 
   return (
     fileFolderData && (
@@ -60,17 +68,22 @@ export const TreeNode = ({ fileFolderData }) => {
               ) : (
                 <RightOutlined className="arrow-icon" />
               )}
-              <FolderOutlined className="folder-icon" />
+              {visibility[fileFolderData.name] ? (
+                <FolderOpenOutlined className="folder-icon open" />
+              ) : (
+                <FolderOutlined className="folder-icon" />
+              )}
               <span className="node-text">{fileFolderData.name}</span>
             </button>
           </div>
         ) : (
           <div
-            className="file-node"
+            className={`file-node ${selectedFile === fileFolderData.path ? "selected" : ""
+              }`}
             onContextMenu={(e) =>
               handleContextMenuForFiles(e, fileFolderData.path)
             }
-            onDoubleClick={() => handleDoubleClick(fileFolderData)}
+            onClick={() => handleFileClick(fileFolderData)}
           >
             <div className="file-icon-wrapper">
               <FileIcon extension={computeExtension(fileFolderData)} />
