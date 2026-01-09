@@ -38,7 +38,7 @@ export const ProjectPlayground = () => {
 
             try {
                 const ws = new WebSocket(
-                    "ws://localhost:4000/terminal?projectId=" + projectIdFromUrl
+                    `${import.meta.env.VITE_TERMINAL_WS_URL || "ws://localhost:4000"}/terminal?projectId=${projectIdFromUrl}`
                 );
                 setTerminalSocket(ws);
             } catch (error) {
@@ -258,8 +258,8 @@ export const ProjectPlayground = () => {
                         <button
                             onClick={() => setLoadBrowser(!loadBrowser)}
                             className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all cursor-pointer ${loadBrowser
-                                    ? "bg-blue-500/20 text-blue-400 border border-blue-500/30"
-                                    : "bg-[#292e42] text-gray-300 hover:bg-[#363b54] hover:text-white"
+                                ? "bg-blue-500/20 text-blue-400 border border-blue-500/30"
+                                : "bg-[#292e42] text-gray-300 hover:bg-[#363b54] hover:text-white"
                                 }`}
                         >
                             <span>{loadBrowser ? "🌐" : "👁️"}</span>

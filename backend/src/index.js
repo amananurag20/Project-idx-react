@@ -3,16 +3,20 @@ import cors from 'cors';
 import { createServer } from 'node:http';
 import { Server } from 'socket.io';
 import apiRouter from './routes/index.js';
-import { PORT } from './config/serverConfig.js';
+import { PORT, CORS_ORIGIN } from './config/serverConfig.js';
 import chokidar from 'chokidar';
 import { handleEditorSocketEvents } from './socketHandlers/editorHandler.js';
 
 
 const app = express();
 const server = createServer(app);
+
+// Parse CORS_ORIGIN - supports comma-separated multiple origins or '*'
+const corsOrigins = CORS_ORIGIN === '*' ? '*' : CORS_ORIGIN.split(',').map(origin => origin.trim());
+
 const io = new Server(server, {
     cors: {
-        origin: '*',
+        origin: corsOrigins,
         methods: ['GET', 'POST'],
     },
     pingTimeout: 60000,
@@ -28,7 +32,11 @@ const io = new Server(server, {
 
 app.use(express.json());
 app.use(express.urlencoded());
-app.use(cors());
+app.use(cors({
+    origin: corsOrigins,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    credentials: true
+}));
 
 app.use('/api', apiRouter);
 

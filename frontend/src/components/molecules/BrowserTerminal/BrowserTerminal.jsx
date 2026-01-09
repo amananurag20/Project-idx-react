@@ -49,7 +49,7 @@ export const BrowserTerminal = () => {
             if (projectId) {
                 try {
                     const ws = new WebSocket(
-                        `ws://localhost:4000/terminal?projectId=${projectId}`
+                        `${import.meta.env.VITE_TERMINAL_WS_URL || "ws://localhost:4000"}/terminal?projectId=${projectId}`
                     );
                     setTerminalSocket(ws);
                 } catch (error) {
