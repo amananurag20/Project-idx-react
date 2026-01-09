@@ -4,6 +4,7 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
+    "start": "node src/index.js",
     "dev": "npx nodemon src/index.js",
     "dev:server": "npx nodemon src/index.js",
     "dev:terminal": "npx nodemon src/terminalApp.js",
